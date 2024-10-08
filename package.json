@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "A custom API that can utalize data from a JSON dataset",
   "main": "index.js",
-
   "scripts": {
     "start": "node ./src/server.js",
     "pretest": "eslint ./src --fix",

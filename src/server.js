@@ -14,7 +14,6 @@ const urlStruct = {
     '/getRegion': responseHandler.getCountry, //Get #4 (search by region, return all countries from there)
     '/addCountry': responseHandler.addCountry, //Post #1 
     '/addReview': responseHandler.addReview, //Post #2
-    '/updateCountry': responseHandler.updateCountry, //Post #3, bonus!
     notFound: responseHandler.notFound
 }
 
@@ -41,31 +40,36 @@ const parseBody = (request, response, handler) => {
 
 // handle POST requests
 const handlePost = (request, response, parsedUrl) => {
-    if (parsedUrl.pathname === '/addUser') {
-        parseBody(request, response, responseHandler.addUser);
-    }
+    if (parsedUrl.pathname === '/addCountry') { parseBody(request, response, responseHandler.addCountry); }
+    else if (parsedUrl.pathname === '/addReview') { parseBody(request, response, responseHandler.addReview); }
+    else { responseHandler.notFound(request, response); }
 };
+// '/style.css': responseHandler.getCSS,
+// '/getCountry': responseHandler.getCountry, //Get #1 (search by country name)
+// '/getCountries': responseHandler.getCountries, //Get #2, filtered by several filters
+// '/getAllCountries': responseHandler.getAllCountries, //Get #3. Returns the whole JSON
+// '/getRegion': responseHandler.getCountry, //Get #4 (search by region, return all countries from there)
+// '/addCountry': responseHandler.addCountry, //Post #1 
+// '/addReview': responseHandler.addReview, //Post #2
+
 
 // handle GET requests
 const handleGet = (request, response, parsedUrl) => {
-    if (parsedUrl.pathname === '/') {
-        responseHandler.getIndex(request, response);
-    }
-    else if (parsedUrl.pathname === '/style.css') {
-        responseHandler.getCSS(request, response);
-    } else if (parsedUrl.pathname === '/getUsers') {
-        responseHandler.getUsers(request, response);
-    } else if (parsedUrl.pathname === '/notReal') {
-        responseHandler.notFound(request, response); 
-    } else {
-        responseHandler.notFound(request, response);
-    }
+    if (parsedUrl.pathname === '/') { responseHandler.getIndex(request, response); }
+    else if (parsedUrl.pathname === '/style.css') { responseHandler.getCSS(request, response); } 
+    else if (parsedUrl.pathname === '/getCountry') { responseHandler.getCountry(request, response); }
+    else if (parsedUrl.pathname === '/getCountries') { responseHandler.getCountries(request, response); } 
+    else if (parsedUrl.pathname === '/getAllCountries') { responseHandler.getAllCountries(request, response); }
+    else if (parsedUrl.pathname === '/getRegion') { responseHandler.getRegion(request, response); }
+    else { responseHandler.notFound(request, response); }
 };
 
 // routes our requests to the correct endpoint
 const onRequest = (request, response) => {
     const protocol = request.connection.encrypted ? 'https' : 'http';
     const parsedUrl = new URL(request.url, `${protocol}://${request.headers.host}`);
+
+    request.query = Object.fromEntries(parsedUrl.searchParams);
 
     if (urlStruct[parsedUrl.pathname]) {
         if (request.method === 'POST') {
