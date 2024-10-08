@@ -1,0 +1,19 @@
+{
+  "name": "igme430-project1",
+  "version": "1.0.0",
+  "description": "A custom API that can utalize data from a JSON dataset",
+  "main": "index.js",
+
+  "scripts": {
+    "start": "node ./src/server.js",
+    "pretest": "eslint ./src --fix",
+    "test": "echo \"Test complete\""
+  },
+  "author": "Igor Polotai",
+  "license": "ISC",
+  "dependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.31.0"
+  }
+}
