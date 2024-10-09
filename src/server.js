@@ -9,7 +9,7 @@ const urlStruct = {
     '/': responseHandler.getIndex,
     '/style.css': responseHandler.getCSS,
     '/getCountry': responseHandler.getCountry, //Get #1 (search by country name)
-    '/getCountries': responseHandler.getCountries, //Get #2, filtered by several filters
+    '/getCountries': responseHandler.getCountries, //Get #2, filtered by lat and lon ranges
     '/getAllCountries': responseHandler.getAllCountries, //Get #3. Returns the whole JSON
     '/getRegion': responseHandler.getCountry, //Get #4 (search by region, return all countries from there)
     '/addCountry': responseHandler.addCountry, //Post #1 
@@ -33,10 +33,24 @@ const parseBody = (request, response, handler) => {
 
     request.on('end', () => {
         const bodyString = Buffer.concat(body).toString();
-        request.body = query.parse(bodyString);
+        
+        // Determine content type and parse accordingly
+        if (request.headers['Content-Type'] === 'application/json') {
+            try {
+                request.body = JSON.parse(bodyString);
+            } catch (err) {
+                response.statusCode = 400;
+                response.end();
+                return;
+            }
+        } else {
+            request.body = query.parse(bodyString);
+        }
+        
         handler(request, response);
     });
 };
+
 
 // handle POST requests
 const handlePost = (request, response, parsedUrl) => {
@@ -44,14 +58,6 @@ const handlePost = (request, response, parsedUrl) => {
     else if (parsedUrl.pathname === '/addReview') { parseBody(request, response, responseHandler.addReview); }
     else { responseHandler.notFound(request, response); }
 };
-// '/style.css': responseHandler.getCSS,
-// '/getCountry': responseHandler.getCountry, //Get #1 (search by country name)
-// '/getCountries': responseHandler.getCountries, //Get #2, filtered by several filters
-// '/getAllCountries': responseHandler.getAllCountries, //Get #3. Returns the whole JSON
-// '/getRegion': responseHandler.getCountry, //Get #4 (search by region, return all countries from there)
-// '/addCountry': responseHandler.addCountry, //Post #1 
-// '/addReview': responseHandler.addReview, //Post #2
-
 
 // handle GET requests
 const handleGet = (request, response, parsedUrl) => {

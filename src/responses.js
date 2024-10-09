@@ -42,9 +42,41 @@ const getCountry = (request, response) => {
     else { respondJSON(request, response, 404, { message: "Country not found" }); }
 };
 
+//Returns all of the countries within the latitude and longitude ranges
 const getCountries = (request, response) => {
+    // Check for the existence of required parameters
+    if (!request.query.latmin || !request.query.latmax || 
+        !request.query.longmin || !request.query.longmax) {
+        return respondJSON(request, response, 404, { message: "All four parameters are required.", id: "missingParams" });
+    }
 
+    // Convert query parameters to numbers
+    const latmin = parseFloat(request.query.latmin);
+    const latmax = parseFloat(request.query.latmax);
+    const longmin = parseFloat(request.query.longmin);
+    const longmax = parseFloat(request.query.longmax);
+
+    // Check if the converted parameters are valid numbers
+    if (isNaN(latmin) || isNaN(latmax) || isNaN(longmin) || isNaN(longmax)) {
+        return respondJSON(request, response, 404, { message: "One or more of the parameters were not numbers.", id: "invalidParams" });
+    }
+
+    // Filter countries based on latitude and longitude ranges
+    const filtered = data.filter((country) => 
+        parseFloat(country.latitude) >= latmin && 
+        parseFloat(country.latitude) <= latmax &&
+        parseFloat(country.longitude) >= longmin &&
+        parseFloat(country.longitude) <= longmax
+    );
+
+    // Return filtered results
+    if (filtered.length > 0) {
+        return respondJSON(request, response, 200, filtered); 
+    } else {
+        return respondJSON(request, response, 404, { message: "No countries found within the specified range." });
+    }
 };
+
 
 // return JSON of all countries data
 const getAllCountries = (request, response) => {
@@ -56,7 +88,6 @@ const getAllCountries = (request, response) => {
 };
 
 const getRegion = (request, response) => {
-
     if ((!request.query.subregion && !request.query.region)
         || (request.query.subregion && request.query.region)) {
         return respondJSON(request, response, 404, { message: "Either a region or a subregion is allowed. Neither or both is forbidden.", id: "invalidParams" });
@@ -76,6 +107,10 @@ const getRegion = (request, response) => {
     if (filtered) { return respondJSON(request, response, 200, filtered); } 
     else { return respondJSON(request, response, 404, { message: "Country not found" }); }
 };
+
+//http://127.0.0.1:3000/addCountry?name=e&capital=e&currency=e&
+//currency_name=w&currency_symbol=3&region=3&subregion=23&nationality=djs&zoneName=3&
+//gmtOffset=sss&gmtOffsetName=sss&abbreviation=e&tzName=sjsjs&latitude=1.000&longitude=1.999
 
 // uses a POST to update or add a country
 const addCountry = (request, response) => {
