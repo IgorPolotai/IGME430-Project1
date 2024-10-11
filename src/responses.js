@@ -108,8 +108,23 @@ const getRegion = (request, response) => {
 // gmtOffset=sss&gmtOffsetName=sss&abbreviation=e&tzName=sjsjs&latitude=1.000&longitude=1.999
 
 // uses a POST to update or add a country
+
+// console.log("Name: " + name);
+// console.log("Capital: " + capital);
+// console.log("Currency: " + currency);
+// console.log("Currency Symbol:" + currencySymbol);
+// console.log("Region: " + region);
+// console.log("Subregion: " + subregion);
+// console.log("Nationality: " + nationality);
+// console.log("Zone Name: " + zoneName);
+// console.log("GMT Offset: " + gmtOffset);
+// console.log("GMT Offset Name: " + gmtOffsetName);
+// console.log("Abbreviation: " + abbreviation);
+// console.log("TZ Name: " + tzName);
+// console.log("Latitude: " + latitude);
+// console.log("Longitude: " + longitude);
+
 const addCountry = (request, response) => {
-  // default json message
   const responseJSON = {
     message: 'All parameters are required.',
   };
@@ -117,44 +132,46 @@ const addCountry = (request, response) => {
   const {
     name,
     capital,
-    currency,
-    currencyName,
-    currencySymbol,
+    finance,
     region,
     subregion,
     nationality,
+    timezones,
+    latitude,
+    longitude,
+  } = request.body;
+
+  // Check if finance and timezones are provided
+  if (!finance || !finance.currency || !finance.currency_name || !finance.currency_symbol
+      || !timezones || timezones.length === 0) {
+    responseJSON.id = 'missingParams';
+    return respondJSON(request, response, 400, responseJSON);
+  }
+
+  const {
+    currency,
+    currencyName,
+    currencySymbol,
+  } = finance;
+
+  const timezone = timezones[0]; // Get the first timezone from the array
+
+  if (!timezone || !timezone.zoneName || !timezone.gmtOffset || !timezone.gmtOffsetName
+      || !timezone.abbreviation || !timezone.tzName) {
+    responseJSON.id = 'missingParams';
+    return respondJSON(request, response, 400, responseJSON);
+  }
+
+  const {
     zoneName,
     gmtOffset,
     gmtOffsetName,
     abbreviation,
     tzName,
-    latitude,
-    longitude,
-  } = request.body;
+  } = timezone;
 
-  console.log("Name: " + name);
-  console.log("Capital: " + capital);
-  console.log("Currency: " + currency);
-  console.log("Currency Symbol:" + currencySymbol);
-  console.log("Region: " + region);
-  console.log("Subregion: " + subregion);
-  console.log("Nationality: " + nationality);
-  console.log("Zone Name: " + zoneName);
-  console.log("GMT Offset: " + gmtOffset);
-  console.log("GMT Offset Name: " + gmtOffsetName);
-  console.log("Abbreviation: " + abbreviation);
-  console.log("TZ Name: " + tzName);
-  console.log("Latitude: " + latitude);
-  console.log("Longitude: " + longitude);
-
-
-  if (!name || !capital || !currency
-        || !currencyName || !currencySymbol
-        || !region || !subregion
-        || !nationality || !zoneName
-        || !gmtOffset || !gmtOffsetName || !abbreviation
-        || !tzName || !latitude || !longitude
-  ) {
+  // Validate other required fields
+  if (!name || !capital || !region || !subregion || !nationality || !latitude || !longitude) {
     responseJSON.id = 'missingParams';
     return respondJSON(request, response, 400, responseJSON);
   }
@@ -187,6 +204,7 @@ const addCountry = (request, response) => {
     };
   }
 
+  // Update country details
   data[name].capital = capital;
   data[name].finance.currency = currency;
   data[name].finance.currency_name = currencyName;
@@ -210,7 +228,31 @@ const addCountry = (request, response) => {
   return respondJSON(request, response, responseCode, {});
 };
 
-const addReview = (request, response) => respondJSON(request, response, 404, {});
+const addReview = (request, response) => {
+  // console.log(`Review: ${request.query.review}`);
+  // console.log(`Name: ${request.query.name}`);
+  console.log(request.body.name);
+
+  const responseJSON = {
+    message: 'An error occurred.',
+  };
+
+  if (!request.query.name || !request.query.review) {
+    return respondJSON(request, response, 404, { message: 'Both parameters are required.', id: 'missingParams' });
+  }
+
+  if (data[request.body.name] === undefined) {
+    return respondJSON(request, response, 404, { message: 'Country not found' });
+  }
+
+  data[request.body.name].review = request.body.review;
+
+  // console.log(data[request.body.name].review);
+
+  respondJSON.message = 'Created successfully';
+
+  return respondJSON(request, response, 200, responseJSON);
+};
 
 // Gets a not found error response
 const notFound = (request, response) => respondJSON(

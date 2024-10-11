@@ -43,8 +43,11 @@ const parseBody = (request, response, handler) => {
         response.end();
         return;
       }
-    } else {
+    } else if (request.headers['Content-Type'] === 'application/x-www-form-urlencoded') {
       request.body = query.parse(bodyString);
+    } else {
+      // Implement returning error
+      return;
     }
 
     handler(request, response);
