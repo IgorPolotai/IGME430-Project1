@@ -129,6 +129,8 @@ const addCountry = (request, response) => {
     message: 'All parameters are required.',
   };
 
+  // console.log(request.body);
+
   const {
     name,
     capital,
@@ -178,10 +180,12 @@ const addCountry = (request, response) => {
 
   let responseCode = 204;
 
+  let country = data.find((x) => x.name.toLowerCase() === name.toLowerCase());
+
   // If the country doesn't exist yet
-  if (!data[name]) {
+  if (!country) {
     responseCode = 201;
-    data[name] = {
+    data.push({
       name,
       capital,
       finance: {
@@ -201,24 +205,28 @@ const addCountry = (request, response) => {
       },
       latitude,
       longitude,
-    };
+    });
   }
 
+  country = data.find((x) => x.name.toLowerCase() === name.toLowerCase());
+
   // Update country details
-  data[name].capital = capital;
-  data[name].finance.currency = currency;
-  data[name].finance.currency_name = currencyName;
-  data[name].finance.currency_symbol = currencySymbol;
-  data[name].region = region;
-  data[name].subregion = subregion;
-  data[name].nationality = nationality;
-  data[name].timezones.zoneName = zoneName;
-  data[name].timezones.gmtOffset = gmtOffset;
-  data[name].timezones.gmtOffsetName = gmtOffsetName;
-  data[name].timezones.abbreviation = abbreviation;
-  data[name].timezones.tzName = tzName;
-  data[name].latitude = latitude;
-  data[name].longitude = longitude;
+  country.capital = capital;
+  country.finance.currency = currency;
+  country.finance.currency_name = currencyName;
+  country.finance.currency_symbol = currencySymbol;
+  country.region = region;
+  country.subregion = subregion;
+  country.nationality = nationality;
+  country.timezones.zoneName = zoneName;
+  country.timezones.gmtOffset = gmtOffset;
+  country.timezones.gmtOffsetName = gmtOffsetName;
+  country.timezones.abbreviation = abbreviation;
+  country.timezones.tzName = tzName;
+  country.latitude = latitude;
+  country.longitude = longitude;
+
+  data.sort();
 
   if (responseCode === 201) {
     responseJSON.message = 'Created Successfully';
@@ -231,25 +239,29 @@ const addCountry = (request, response) => {
 const addReview = (request, response) => {
   // console.log(`Review: ${request.query.review}`);
   // console.log(`Name: ${request.query.name}`);
-  console.log(request.body.name);
+  // console.log(request.body.name);
 
   const responseJSON = {
     message: 'An error occurred.',
   };
 
-  if (!request.query.name || !request.query.review) {
-    return respondJSON(request, response, 404, { message: 'Both parameters are required.', id: 'missingParams' });
+  if (!request.body.name || !request.body.review) {
+    return respondJSON(request, response, 400, { message: 'Both parameters are required.', id: 'missingParams' });
   }
 
-  if (data[request.body.name] === undefined) {
+  let { name } = request.body;
+  name = name.toLowerCase();
+  const country = data.find((x) => x.name.toLowerCase() === name);
+
+  if (!country) {
     return respondJSON(request, response, 404, { message: 'Country not found' });
   }
 
-  data[request.body.name].review = request.body.review;
+  country.review = request.body.review;
 
   // console.log(data[request.body.name].review);
 
-  respondJSON.message = 'Created successfully';
+  responseJSON.message = 'Created successfully';
 
   return respondJSON(request, response, 200, responseJSON);
 };

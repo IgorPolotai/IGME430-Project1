@@ -35,7 +35,7 @@ const parseBody = (request, response, handler) => {
     const bodyString = Buffer.concat(body).toString();
 
     // Determine content type and parse accordingly
-    if (request.headers['Content-Type'] === 'application/json') {
+    if (request.headers['content-type'] === 'application/json') {
       try {
         request.body = JSON.parse(bodyString);
       } catch (err) {
@@ -43,7 +43,7 @@ const parseBody = (request, response, handler) => {
         response.end();
         return;
       }
-    } else if (request.headers['Content-Type'] === 'application/x-www-form-urlencoded') {
+    } else if (request.headers['content-type'] === 'application/x-www-form-urlencoded') {
       request.body = query.parse(bodyString);
     } else {
       // Implement returning error
@@ -56,7 +56,9 @@ const parseBody = (request, response, handler) => {
 
 // handle POST requests
 const handlePost = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/addCountry') { parseBody(request, response, responseHandler.addCountry); } else if (parsedUrl.pathname === '/addReview') { parseBody(request, response, responseHandler.addReview); } else { responseHandler.notFound(request, response); }
+  if (parsedUrl.pathname === '/addCountry') { parseBody(request, response, responseHandler.addCountry); } 
+  else if (parsedUrl.pathname === '/addReview') { parseBody(request, response, responseHandler.addReview); } 
+  else { responseHandler.notFound(request, response); }
 };
 
 // handle GET requests
