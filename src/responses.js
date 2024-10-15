@@ -4,6 +4,8 @@ const index = fs.readFileSync(`${__dirname}/../client/client.html`);
 const css = fs.readFileSync(`${__dirname}/../client/style.css`);
 const data = JSON.parse(fs.readFileSync(`${__dirname}/../data/countries.json`));
 
+const favorites = [];
+
 // Gets the index html
 const getIndex = (request, response) => {
   response.writeHead(200, { 'Content-Type': 'text/html' });
@@ -103,6 +105,15 @@ const getRegion = (request, response) => {
   return respondJSON(request, response, 404, { message: 'Country not found' });
 };
 
+// return JSON of all favorite data
+const getFavorites = (request, response) => {
+  const responseJSON = {
+    favorites,
+  };
+
+  respondJSON(request, response, 200, responseJSON);
+};
+
 // http://127.0.0.1:3000/addCountry?name=e&capital=e&currency=e&
 // currency_name=w&currency_symbol=3&region=3&subregion=23&nationality=djs&zoneName=3&
 // gmtOffset=sss&gmtOffsetName=sss&abbreviation=e&tzName=sjsjs&latitude=1.000&longitude=1.999
@@ -123,6 +134,16 @@ const getRegion = (request, response) => {
 // console.log("TZ Name: " + tzName);
 // console.log("Latitude: " + latitude);
 // console.log("Longitude: " + longitude);
+
+const addFavorites = (request, response) => {
+  const name = (request.body.name).toLowerCase();
+  const filtered = data.find((country) => country.name.toLowerCase() === name);
+
+  if (filtered) {
+    favorites.push(filtered);
+    respondJSON(request, response, 200, { message: 'Country added to favorites' });
+  } else { respondJSON(request, response, 404, { message: 'Country not found' }); }
+};
 
 const addCountry = (request, response) => {
   const responseJSON = {
@@ -281,7 +302,9 @@ module.exports = {
   getCountries,
   getAllCountries,
   getRegion,
+  getFavorites,
   addCountry,
   addReview,
+  addFavorites,
   notFound,
 };

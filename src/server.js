@@ -12,8 +12,10 @@ const urlStruct = {
   '/getCountries': responseHandler.getCountries, // Get #2, filtered by lat and lon ranges
   '/getAllCountries': responseHandler.getAllCountries, // Get #3. Returns the whole JSON
   '/getRegion': responseHandler.getCountry, // Get #4 (search by region, return all countries from there)
+  '/getFavorites': responseHandler.getFavorites, // Get #5 (save your favorite countries)
   '/addCountry': responseHandler.addCountry, // Post #1
   '/addReview': responseHandler.addReview, // Post #2
+  '/addFavorites': responseHandler.addFavorites, // Post #3
   notFound: responseHandler.notFound,
 };
 
@@ -56,14 +58,12 @@ const parseBody = (request, response, handler) => {
 
 // handle POST requests
 const handlePost = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/addCountry') { parseBody(request, response, responseHandler.addCountry); } 
-  else if (parsedUrl.pathname === '/addReview') { parseBody(request, response, responseHandler.addReview); } 
-  else { responseHandler.notFound(request, response); }
+  if (parsedUrl.pathname === '/addCountry') { parseBody(request, response, responseHandler.addCountry); } else if (parsedUrl.pathname === '/addReview') { parseBody(request, response, responseHandler.addReview); } else if (parsedUrl.pathname === '/addFavorites') { parseBody(request, response, responseHandler.addFavorites); } else { responseHandler.notFound(request, response); }
 };
 
 // handle GET requests
 const handleGet = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/') { responseHandler.getIndex(request, response); } else if (parsedUrl.pathname === '/style.css') { responseHandler.getCSS(request, response); } else if (parsedUrl.pathname === '/getCountry') { responseHandler.getCountry(request, response); } else if (parsedUrl.pathname === '/getCountries') { responseHandler.getCountries(request, response); } else if (parsedUrl.pathname === '/getAllCountries') { responseHandler.getAllCountries(request, response); } else if (parsedUrl.pathname === '/getRegion') { responseHandler.getRegion(request, response); } else { responseHandler.notFound(request, response); }
+  if (parsedUrl.pathname === '/') { responseHandler.getIndex(request, response); } else if (parsedUrl.pathname === '/style.css') { responseHandler.getCSS(request, response); } else if (parsedUrl.pathname === '/getCountry') { responseHandler.getCountry(request, response); } else if (parsedUrl.pathname === '/getCountries') { responseHandler.getCountries(request, response); } else if (parsedUrl.pathname === '/getAllCountries') { responseHandler.getAllCountries(request, response); } else if (parsedUrl.pathname === '/getRegion') { responseHandler.getRegion(request, response); } else if (parsedUrl.pathname === '/getFavorites') { responseHandler.getFavorites(request, response); } else { responseHandler.notFound(request, response); }
 };
 
 // routes our requests to the correct endpoint
