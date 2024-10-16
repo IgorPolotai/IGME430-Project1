@@ -18,6 +18,29 @@ html, body {
   font-size: 30px;
 }
 
+button{
+  display : inline-block;
+  cursor : pointer;
+
+  border-style : solid;
+  border-width : 1px;
+  padding : 10px 18px;
+  margin-top: 10px;
+  box-shadow : 0 1px 4px rgba(0,0,0,.6);
+  font-size : 9.5pt;
+  font-weight : bold;
+  color : black;
+  text-decoration : none;
+}
+
+button:hover{
+    background: #fcf8c0;
+}
+
+button:active{
+    background: yellow;
+}
+
   /* #top {
     text-align: center;
     margin: 0 auto;
