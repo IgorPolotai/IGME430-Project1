@@ -1,6 +1,7 @@
 const fs = require('fs'); // pull in the file system module
 
 const index = fs.readFileSync(`${__dirname}/../client/client.html`);
+const doc = fs.readFileSync(`${__dirname}/../client/doc.html`);
 const css = fs.readFileSync(`${__dirname}/../client/style.css`);
 const data = JSON.parse(fs.readFileSync(`${__dirname}/../data/countries.json`));
 
@@ -10,6 +11,13 @@ const favorites = [];
 const getIndex = (request, response) => {
   response.writeHead(200, { 'Content-Type': 'text/html' });
   response.write(index);
+  response.end();
+};
+
+// Gets the doc html
+const getDocumentation = (request, response) => {
+  response.writeHead(200, { 'Content-Type': 'text/html' });
+  response.write(doc);
   response.end();
 };
 
@@ -23,7 +31,7 @@ const getCSS = (request, response) => {
 // Sends back a JSON response
 const respondJSON = (request, response, status, object) => {
   const content = JSON.stringify(object);
-  console.log(content);
+  // console.log(content);
   response.writeHead(status, {
     'Content-Type': 'application/json',
     'Content-Length': Buffer.byteLength(content, 'utf8'),
@@ -48,7 +56,7 @@ const getCountries = (request, response) => {
   // Check for the existence of required parameters
   if (!request.query.latmin || !request.query.latmax
         || !request.query.longmin || !request.query.longmax) {
-    return respondJSON(request, response, 404, { message: 'All four parameters are required.', id: 'missingParams' });
+    return respondJSON(request, response, 400, { message: 'All four parameters are required.', id: 'missingParams' });
   }
 
   // Convert query parameters to numbers
@@ -60,7 +68,11 @@ const getCountries = (request, response) => {
   // Check if the converted parameters are valid numbers
   if (Number.isNaN(latmin) || Number.isNaN(latmax)
       || Number.isNaN(longmin) || Number.isNaN(longmax)) {
-    return respondJSON(request, response, 404, { message: 'One or more of the parameters were not numbers.', id: 'invalidParams' });
+    return respondJSON(request, response, 400, { message: 'One or more of the parameters were not numbers.', id: 'invalidParams' });
+  }
+
+  if (latmax < latmin || longmax < longmin) {
+    return respondJSON(request, response, 400, { message: 'Either the lat or long min range value is larger than its max range value.', id: 'invalidParams' });
   }
 
   // Filter countries based on latitude and longitude ranges
@@ -70,7 +82,7 @@ const getCountries = (request, response) => {
         && parseFloat(country.longitude) <= longmax);
 
   // Return filtered results
-  if (filtered.length > 0) {
+  if (filtered.length) {
     return respondJSON(request, response, 200, filtered);
   }
   return respondJSON(request, response, 404, { message: 'No countries found within the specified range.' });
@@ -101,6 +113,10 @@ const getRegion = (request, response) => {
     filtered = data.filter((country) => country.subregion.toLowerCase() === subregion);
   }
 
+  if (!filtered.length) {
+    return respondJSON(request, response, 400, { message: 'There are no countries in this region/subregion' });
+  }
+
   if (filtered) { return respondJSON(request, response, 200, filtered); }
   return respondJSON(request, response, 404, { message: 'Country not found' });
 };
@@ -113,27 +129,6 @@ const getFavorites = (request, response) => {
 
   respondJSON(request, response, 200, responseJSON);
 };
-
-// http://127.0.0.1:3000/addCountry?name=e&capital=e&currency=e&
-// currency_name=w&currency_symbol=3&region=3&subregion=23&nationality=djs&zoneName=3&
-// gmtOffset=sss&gmtOffsetName=sss&abbreviation=e&tzName=sjsjs&latitude=1.000&longitude=1.999
-
-// uses a POST to update or add a country
-
-// console.log("Name: " + name);
-// console.log("Capital: " + capital);
-// console.log("Currency: " + currency);
-// console.log("Currency Symbol:" + currencySymbol);
-// console.log("Region: " + region);
-// console.log("Subregion: " + subregion);
-// console.log("Nationality: " + nationality);
-// console.log("Zone Name: " + zoneName);
-// console.log("GMT Offset: " + gmtOffset);
-// console.log("GMT Offset Name: " + gmtOffsetName);
-// console.log("Abbreviation: " + abbreviation);
-// console.log("TZ Name: " + tzName);
-// console.log("Latitude: " + latitude);
-// console.log("Longitude: " + longitude);
 
 const addFavorites = (request, response) => {
   const name = (request.body.name).toLowerCase();
@@ -155,19 +150,31 @@ const addCountry = (request, response) => {
   const {
     name,
     capital,
-    finance,
+    finance: financeString,
     region,
     subregion,
     nationality,
-    timezones,
+    timezones: timezonesString,
     latitude,
     longitude,
   } = request.body;
 
+  // Parse the finance and timezones from JSON strings to objects/arrays
+  let finance;
+  let timezones;
+
+  try {
+    finance = JSON.parse(financeString);
+    timezones = JSON.parse(timezonesString);
+  } catch (error) {
+    responseJSON.id = 'invalidJSON';
+    return respondJSON(request, response, 400, responseJSON);
+  }
+
   // Check if finance and timezones are provided
   if (!finance || !finance.currency || !finance.currency_name || !finance.currency_symbol
       || !timezones || timezones.length === 0) {
-    responseJSON.id = 'missingParams';
+    responseJSON.id = 'missingParamsFinance';
     return respondJSON(request, response, 400, responseJSON);
   }
 
@@ -181,17 +188,9 @@ const addCountry = (request, response) => {
 
   if (!timezone || !timezone.zoneName || !timezone.gmtOffset || !timezone.gmtOffsetName
       || !timezone.abbreviation || !timezone.tzName) {
-    responseJSON.id = 'missingParams';
+    responseJSON.id = 'missingParamsTimezones';
     return respondJSON(request, response, 400, responseJSON);
   }
-
-  const {
-    zoneName,
-    gmtOffset,
-    gmtOffsetName,
-    abbreviation,
-    tzName,
-  } = timezone;
 
   // Validate other required fields
   if (!name || !capital || !region || !subregion || !nationality || !latitude || !longitude) {
@@ -217,13 +216,7 @@ const addCountry = (request, response) => {
       region,
       subregion,
       nationality,
-      timezones: {
-        zoneName,
-        gmtOffset,
-        gmtOffsetName,
-        abbreviation,
-        tzName,
-      },
+      timezones,
       latitude,
       longitude,
     });
@@ -239,15 +232,13 @@ const addCountry = (request, response) => {
   country.region = region;
   country.subregion = subregion;
   country.nationality = nationality;
-  country.timezones.zoneName = zoneName;
-  country.timezones.gmtOffset = gmtOffset;
-  country.timezones.gmtOffsetName = gmtOffsetName;
-  country.timezones.abbreviation = abbreviation;
-  country.timezones.tzName = tzName;
+  country.timezones = timezones; // Update to use the parsed timezones
   country.latitude = latitude;
   country.longitude = longitude;
 
-  data.sort();
+  // This array of objects sort algorithm was taken from here:
+  // https://stackoverflow.com/questions/71456927/how-to-sort-an-array-of-objects-in-javascript
+  data.sort((a, b) => a.name.localeCompare(b.name));
 
   if (responseCode === 201) {
     responseJSON.message = 'Created Successfully';
@@ -258,10 +249,6 @@ const addCountry = (request, response) => {
 };
 
 const addReview = (request, response) => {
-  // console.log(`Review: ${request.query.review}`);
-  // console.log(`Name: ${request.query.name}`);
-  // console.log(request.body.name);
-
   const responseJSON = {
     message: 'An error occurred.',
   };
@@ -297,6 +284,7 @@ const notFound = (request, response) => respondJSON(
 
 module.exports = {
   getIndex,
+  getDocumentation,
   getCSS,
   getCountry,
   getCountries,

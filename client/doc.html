@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>IGME 430 Project 1</title>
+    <title>IGME 430 Project 1 Documentation</title>
     <link rel="stylesheet" type="text/css" href="/style.css">
 
     <script>
@@ -182,21 +182,21 @@
                 const selectedDiv = document.getElementById(selection);
                 selectedDiv.style.display = 'block';
             }
-        };
+        }
 
         window.onload = init;
 
     </script>
+
 </head>
 
 <body>
 
-    <h1>Countries API</h1>
+    <h1>Countries API Documentation</h1>
 
-    <div>
-        <a href="/doc.html">API Documentation</a>
-    </div>
-    
+    <a href="/">Homepage</a>
+    <br>
+
     <select id="apiSelection">
         <option value="getCountry">getCountry</option>
         <option value="getCountries">getCountries</option>
@@ -211,118 +211,125 @@
     <div id="getCountry" class="expandable">
         <h3>getCountry</h3>
         <br>
-        <label> Country Name: <input type="text" id="name_getCountry" size="10" maxlength="20" /></label>
+        <ul> Query Params:
+            <li>Country Name: The name of the country</li>
+        </ul>
         <br>
-        <input type="radio" name="method_getCountry" value="GET" checked> GET </input>
-        <input type="radio" name="method_getCountry" value="HEAD"> HEAD </input>
+        <p>Returns: A JSON object of country info</p>
         <br>
-        <button type="submit" onclick="sendGet('getCountry')">Send Request</button>
+        <ul> Example:
+            <li>Request: /getCountry?name=Canada</li>
+            <li>Result: {"name":"Canada","capital":"Ottawa","finance":{"currency":"CAD","currency_name":"Canadian dollar","currency_symbol":"$"}.....}</li>
+        </ul>
     </div>
     <div id="getCountries" class="expandable">
         <h3>getCountries</h3>
         <br>
-        <label> Latitude Min: <input type="text" id="latmin_getCountries" size="10" maxlength="20" /></label>
+        <ul> Query Params:
+            <li>Latitude Min: The minimum latitude float value</li>
+            <li>Latitude Max: The maximum latitude float value</li>
+            <li>Longitude Min: The minimum longitude float value</li>
+            <li>Longitude Max: The maximum longitude float value</li>
+        </ul>
         <br>
-        <label> Latitude Max: <input type="text" id="latmax_getCountries" size="10" maxlength="20" /></label>
+        <p>Returns: An array of JSON objects of countries that are within the lat and long min and max ranges</p>
         <br>
-        <label> Longitude Min: <input type="text" id="longmin_getCountries" size="10" maxlength="20" /></label>
-        <br>
-        <label> Longitude Max: <input type="text" id="longmax_getCountries" size="10" maxlength="20" /></label>
-        <br>
-        <input type="radio" name="method_getCountries" value="GET" checked> GET </input>
-        <input type="radio" name="method_getCountries" value="HEAD"> HEAD </input>
-        <br>
-        <button type="submit" onclick="sendGet('getCountries')">Send Request</button>
+        <ul> Example:
+            <li>Request: /getCountries?latmin=1.0&latmax=10.0&longmin=3.0&longmax=39.9</li>
+            <li>Result: [{"name":"Benin","capital":"Porto-Novo","finance":{"currency":"XOF","currency_name":"West African CFA franc".....}}]</li>
+        </ul>
     </div>
     <div id="getAllCountries" class="expandable">
         <h3>getAllCountries</h3>
         <br>
-        <input type="radio" name="method_getAllCountries" value="GET" checked> GET </input>
-        <input type="radio" name="method_getAllCountries" value="HEAD"> HEAD </input>
+        <p>Returns: A JSON object of an array of all JSON country data</p>
         <br>
-        <button type="submit" onclick="sendGet('getAllCountries')">Send Request</button>
+        <ul> Example:
+            <li>Request: /getAllCountries</li>
+            <li>Result: {"data":[{"name":"Afghanistan","capital":"Kabul","finance":{"currency":"AFN","currency_name":"Afghan afghani","currency_symbol":"؋"}.....}}</li>
+        </ul>
     </div>
     <div id="getRegion" class="expandable">
         <h3>getRegion</h3>
         <br>
-        <p>Note: You can only do a region or a subregion. Not both at the same time.</p>
+        <ul> Query Params:
+            <li>Region Name: The name of a region in the world</li>
+            <li>Subregion Name: The name of a subregion in the world</li>
+        </ul>
         <br>
-        <label> Region Name: <input type="text" id="region_getRegion" size="10" maxlength="20" /></label>
+        <p>Returns: A array of JSON objects of countries that are within the region or subregion. You can only input a region or a subregion, neither or both are not allowed.</p>
         <br>
-        <label> Subregion Name: <input type="text" id="subregion_getRegion" size="10" maxlength="20" /></label>
-        <br>
-        <input type="radio" name="method_getRegion" value="GET" checked> GET </input>
-        <input type="radio" name="method_getRegion" value="HEAD"> HEAD </input>
-        <br>
-        <button type="submit" onclick="sendGet('getRegion')">Send Request</button>
+        <ul> Example:
+            <li>Request: /getRegion?region=Americas</li>
+            <li>Result: [{"name":"Anguilla","capital":"The Valley","finance":{"currency":"XCD","currency_name":"East Caribbean dollar","currency_symbol":"$"}.....}]</li>
+        </ul>
     </div>
     <div id="getFavorites" class="expandable">
         <h3>getFavorites</h3>
         <br>
-        <input type="radio" name="method_getFavorites" value="GET" checked> GET </input>
-        <input type="radio" name="method_getFavorites" value="HEAD"> HEAD </input>
+        <p>Returns: An object with the array of JSON objects of countries you added to your favorite list</p>
         <br>
-        <button type="submit" onclick="sendGet('getFavorites')">Send Request</button>
+        <ul> Example:
+            <li>Request: /getFavorites</li>
+            <li>Result: {"favorites":[{"name":"Canada","capital":"Ottawa","finance":{"currency":"CAD","currency_name":"Canadian dollar".....}}}</li>
+        </ul>
     </div>
     <div id="addCountry" class="expandable">
         <h3>addCountry</h3>
         <br>
-        <label> Name: <input type="text" id="name_addCountry" size="10" maxlength="20" /></label>
+        <ul> Query Params:
+            <li>Name: Name of country</li>
+            <li>Capital: Capital of the country</li>
+            <li>Currency: The currency acronym</li>
+            <li>Currency Name: The name of the currency</li>
+            <li>Currency Symbol: The symbol of the currency</li>
+            <li>Region: What continent this country is in</li>
+            <li>Subregion: What part of the region the country is in</li>
+            <li>Nationality: The main nationality of the country</li>
+            <li>Zone Name: Name of the zone</li>
+            <li>GMT Offset: Number of the offset</li>
+            <li>GMT Offset Name: The name of the offset</li>
+            <li>Abbreviation: The abbreviation of the zone</li>
+            <li>Timezone Name: Name of the timezone</li>
+            <li>Latitude: Latitude location of the country</li>
+            <li>Longitude: Longitude location of the country</li>
+        </ul>
         <br>
-        <label> Capital: <input type="text" id="capital_addCountry" size="10" maxlength="20" /></label>
+        <p>Purpose: Adds or updates a country info with the provided info.</p>
         <br>
-        <label> Currency: <input type="text" id="currency_addCountry" size="10" maxlength="20" /></label>
-        <br>
-        <label> Currency Name: <input type="text" id="currencyName_addCountry" size="10" maxlength="20" /></label>
-        <br>
-        <label> Currency Symbol: <input type="text" id="currencySymbol_addCountry" size="10" maxlength="20" /></label>
-        <br>
-        <label> Region: <input type="text" id="region_addCountry" size="10" maxlength="20" /></label>
-        <br>
-        <label> Subregion: <input type="text" id="subregion_addCountry" size="10" maxlength="20" /></label>
-        <br>
-        <label> Nationality: <input type="text" id="nationality_addCountry" size="10" maxlength="20" /></label>
-        <br>
-        <label> Zone Name: <input type="text" id="zoneName_addCountry" size="10" maxlength="20" /></label>
-        <br>
-        <label> GMT Offset: <input type="text" id="gmtOffset_addCountry" size="10" maxlength="20" /></label>
-        <br>
-        <label> GMT Offset Name: <input type="text" id="gmtOffsetName_addCountry" size="10" maxlength="20" /></label>
-        <br>
-        <label> Timezone Abbreviation: <input type="text" id="abbreviation_addCountry" size="10"
-                maxlength="20" /></label>
-        <br>
-        <label> Timezone Name: <input type="text" id="tzName_addCountry" size="10" maxlength="20" /></label>
-        <br>
-        <label> Latitude: <input type="text" id="latitude_addCountry" size="10" maxlength="20" /></label>
-        <br>
-        <label> Longitude: <input type="text" id="longitude_addCountry" size="10" maxlength="20" /></label>
-        <br>
-        <button type="submit" onclick="sendPost('addCountry')">Send Request</button>
+        <ul> Example:
+            <li>Request: /addCountry?name=e&capital=e&currency=e&currency_name=w&currency_symbol=3&region=3&subregion=23&nationality=djs&zoneName=3&gmtOffset=sss&gmtOffsetName=sss&abbreviation=e&tzName=sjsjs&latitude=1.000&longitude=1.999</li>
+            <li>Result: Created successfully!</li>
+        </ul>
     </div>
     <div id="addReview" class="expandable">
         <h3>addReview</h3>
         <br>
-        <label> Country Name: <input type="text" id="name_addReview" size="10" maxlength="20" /></label>
+        <ul> Query Params:
+            <li>Country Name: The name of the country</li>
+            <li>Review: The name of the country</li>
+        </ul>
         <br>
-        <label> Review: <input type="text" id="review_addReview" size="10" /></label>
+        <p>Purpose: Adds a review to an existing country</p>
         <br>
-        <button type="submit" onclick="sendPost('addReview')">Send Request</button>
+        <ul> Example:
+            <li>Request: /addReview?name=Canada&review="good maple syrup"</li>
+            <li>Result: Created successfully!</li>
+        </ul>
     </div>
     <div id="addFavorite" class="expandable">
         <h3>addFavorite</h3>
         <br>
-        <label> Country Name: <input type="text" id="name_addFavorite" size="10" maxlength="20" /></label>
+        <ul> Query Params:
+            <li>Country Name: The name of the country</li>
+        </ul>
         <br>
-        <button type="submit" onclick="sendPost('addFavorite')">Send Request</button>
-    </div>
-
-    <hr>
-
-    <h2 id="message">Your request data will be shown below</h2>
-
-    <div id="content">
-        Send a request to see data!
+        <p>Purpose: Adds a country to your favorites list</p>
+        <br>
+        <ul> Example:
+            <li>Request: /addFavorite?name=Canada</li>
+            <li>Result: Added to favorites</li>
+        </ul>
     </div>
 </body>
 

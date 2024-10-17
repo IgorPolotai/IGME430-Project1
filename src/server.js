@@ -7,6 +7,8 @@ const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 const urlStruct = {
   '/': responseHandler.getIndex,
+  '/doc.html': responseHandler.getDocumentation,
+  '/documentation': responseHandler.getDocumentation,
   '/style.css': responseHandler.getCSS,
   '/getCountry': responseHandler.getCountry, // Get #1 (search by country name)
   '/getCountries': responseHandler.getCountries, // Get #2, filtered by lat and lon ranges
@@ -63,7 +65,7 @@ const handlePost = (request, response, parsedUrl) => {
 
 // handle GET requests
 const handleGet = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/') { responseHandler.getIndex(request, response); } else if (parsedUrl.pathname === '/style.css') { responseHandler.getCSS(request, response); } else if (parsedUrl.pathname === '/getCountry') { responseHandler.getCountry(request, response); } else if (parsedUrl.pathname === '/getCountries') { responseHandler.getCountries(request, response); } else if (parsedUrl.pathname === '/getAllCountries') { responseHandler.getAllCountries(request, response); } else if (parsedUrl.pathname === '/getRegion') { responseHandler.getRegion(request, response); } else if (parsedUrl.pathname === '/getFavorites') { responseHandler.getFavorites(request, response); } else { responseHandler.notFound(request, response); }
+  if (parsedUrl.pathname === '/') { responseHandler.getIndex(request, response); } else if (parsedUrl.pathname === '/style.css') { responseHandler.getCSS(request, response); } else if (parsedUrl.pathname === '/doc.html') { responseHandler.getDocumentation(request, response); } else if (parsedUrl.pathname === '/getCountry') { responseHandler.getCountry(request, response); } else if (parsedUrl.pathname === '/getCountries') { responseHandler.getCountries(request, response); } else if (parsedUrl.pathname === '/getAllCountries') { responseHandler.getAllCountries(request, response); } else if (parsedUrl.pathname === '/getRegion') { responseHandler.getRegion(request, response); } else if (parsedUrl.pathname === '/getFavorites') { responseHandler.getFavorites(request, response); } else { responseHandler.notFound(request, response); }
 };
 
 // routes our requests to the correct endpoint
